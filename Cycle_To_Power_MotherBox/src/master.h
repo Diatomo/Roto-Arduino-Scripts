@@ -15,6 +15,7 @@ struct cycle{
 		uint32_t prevAcc;
 		uint8_t energyMeter;
 		uint32_t energyTimer;
+		//DigitGroup* display;
 };
 typedef cycle Cycle;
 
@@ -43,8 +44,6 @@ class Master{
 				uint32_t static const accTHRESH = 10; 
 				uint32_t static const emTHRESH = 20;
 				uint32_t static const losePowerTHRESH = 3000;
-				//uint32_t static constexpr timeMultipliers[9] = {10,20,30,40,50,60,70,80,90};
-				//uint32_t static constexpr deviceInput[5] = {2, 10, 3, 4, 6};
 
 				//slave boards
 				uint8_t static const leds = 10;
@@ -70,5 +69,6 @@ class Master{
 				//alarmClocks	
 				uint32_t resetTimr = 30000; // 30seconds
 				uint8_t currDevice = 0;
+
 };
 #endif

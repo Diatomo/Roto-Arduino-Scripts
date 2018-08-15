@@ -1,10 +1,9 @@
-#include <Arduino.h>
-#include <Wire.h>
+
 #include "master.h"
 
 
-uint32_t const timeMultipliers[9] = {10,20,30,40,50,60,70,80,90};
 uint32_t const deviceInput[5] = {2, 10, 3, 4, 6};
+
 
 /*
  *
@@ -17,6 +16,7 @@ Master::Master(){
 
 		Wire.begin();//init i2c
 
+		uint8_t nDisplays = 2;
 		//creation of data structure
 		for (uint8_t i = 0; i < NUM_BIKES; i++){
 
@@ -26,6 +26,8 @@ Master::Master(){
 				cycle.acc = 0;
 				cycle.energyMeter = 0;
 				cycle.energyTimer = 0;
+				//cycle.display = dig.addGroup(address, nDisplays);
+				//cycle.display = dig.addGroup(address, nDisplays);
 
 				//add to array
 				Cycles[i] = cycle;
@@ -64,6 +66,7 @@ void Master::gainPower(Cycle& bike){
 			bike.acc = 0;
 			bike.energyTimer = millis();
 			bike.energyMeter++;
+			//bike.display->segDisp(bike.energyMeter, false);
 			Serial.println(bike.energyMeter);
 		}
 }
@@ -79,6 +82,7 @@ void Master::losePower(Cycle& bike){
 		if (currentTime > losePowerTHRESH && bike.energyMeter > 0){
 				bike.energyTimer = millis();
 				bike.energyMeter--;
+				//bike.display->segDisp(bike.energyMeter, false);
 		}
 }
 
@@ -94,6 +98,7 @@ void Master::adjustPower(){
 			int8_t difference = abs(currAcc - Cycles[i].prevAcc);
 			Cycles[i].acc += abs(difference);
 			Cycles[i].prevAcc = currAcc;
+			Serial.println(currAcc);
 			gainPower(Cycles[i]); // if the bike is being pedaled;
 			losePower(Cycles[i]); // if stopped pedaling for duration of time	
 	}
@@ -121,13 +126,9 @@ uint8_t Master::packLeds(){
 }
 
 void Master::transmit(uint8_t address, int8_t package){
-		uint8_t error = 10;
 		Wire.beginTransmission(address);
 		Wire.write(package);
-		delay(100);
-		Serial.print("transmit package :: ");
-		Serial.println(package);
-		error = Wire.endTransmission();
+		Wire.endTransmission();
 }
 
 
@@ -139,6 +140,7 @@ void Master::transmit(uint8_t address, int8_t package){
 void Master::initRoundStart(){
 		for (uint8_t i = 0; i < NUM_BIKES; i++){
 				//if (!roundStarted && Cycles[i].energyMeter){
+				//Cycles[i].display->segDisp(0, false);
 				if (!roundStarted && Cycles[i].encoder){
 					roundStarted = true; 
 					roundTimer = millis();
@@ -151,6 +153,7 @@ void Master::initRoundStart(){
 
 void Master::winState(){
 		
+		uint32_t timeMultipliers[9] = {10,20,30,40,50,60,70,80,90};
 		uint8_t totalEnergy = 0;
 		for (uint8_t i = 0; i < NUM_BIKES; i++){
 				totalEnergy += Cycles[i].energyMeter;
@@ -187,7 +190,6 @@ void Master::reset(){
 void Master::update(uint8_t action){
 	//transmit(relay, packRelay(HIGH, audioOne));
 	delay(200);
-	Serial.print("WTF IS THE CURRENT DEVICE!! :: ");
 	Serial.println(currDevice);
 	transmit(relay, packRelay(HIGH, currDevice));
 }
