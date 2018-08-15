@@ -7,7 +7,7 @@
 #define versionString "Roto - [Discovery World Energy] [Cycle to Power]"
 #define COLOR_ORDER RGB
 
-int32_t const LENGTH_LEDS[8] = {92,95,38,50,50,50,50,50};
+int32_t const LENGTH_LEDS[8] = {92,95,50,50,50,50,50,50};
 uint8_t const neoPins[8] = {4,5,6,7,8,9,10,11};
 uint8_t const MultiIndex[8] = { 0,5,10,15,20,25,30,35 };
 
@@ -22,11 +22,21 @@ CLeds::CLeds(){
 	//constructors
 	FastLED.addLeds<NEOPIXEL,4>(leds, LENGTH_LEDS[0]); 
 	FastLED.addLeds<NEOPIXEL,5>(leds, LENGTH_LEDS[1]); 
-	FastLED.addLeds<NEOPIXEL,6>(leds, LENGTH_LEDS[2]); 
-	FastLED.addLeds<NEOPIXEL,7>(leds, LENGTH_LEDS[3]); 
-	FastLED.addLeds<NEOPIXEL,8>(leds, LENGTH_LEDS[4]); 
+	FastLED.addLeds<NEOPIXEL,6>(leds, LENGTH_LEDS[2]);//monkeys 
+	FastLED.addLeds<NEOPIXEL,7>(leds, LENGTH_LEDS[3]);//optocopter 
+	FastLED.addLeds<NEOPIXEL,8>(leds, LENGTH_LEDS[4]);//blender 
 	FastLED.addLeds<NEOPIXEL,9>(leds, LENGTH_LEDS[5]);
-	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[6]);
+	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[6]);//chainsaw
+	FastLED.addLeds<NEOPIXEL,11>(leds, LENGTH_LEDS[7]);
+	
+	//constructors
+	FastLED.addLeds<NEOPIXEL,4>(leds, LENGTH_LEDS[0]); 
+	FastLED.addLeds<NEOPIXEL,5>(leds, LENGTH_LEDS[1]); 
+	FastLED.addLeds<NEOPIXEL,6>(leds, LENGTH_LEDS[2]);//monkeys 
+	FastLED.addLeds<NEOPIXEL,7>(leds, LENGTH_LEDS[3]);//optocopter 
+	FastLED.addLeds<NEOPIXEL,8>(leds, LENGTH_LEDS[4]);//blender 
+	FastLED.addLeds<NEOPIXEL,9>(leds, LENGTH_LEDS[5]);
+	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[6]);//chainsaw
 	FastLED.addLeds<NEOPIXEL,11>(leds, LENGTH_LEDS[7]);
 	
 	//pin declarations && constants;
@@ -65,7 +75,7 @@ void CLeds::animTest(uint8_t device, uint8_t ledChase){
 	uint8_t index = 0;
 	while (index < LENGTH_LEDS[ledChase] + DIM_OFFSET){
 		for (uint8_t i = 0; i < LENGTH_LEDS[ledChase]; i++){
-			leds[i].fadeToBlackBy(64); // fade by 25% aka 64/256ths
+			leds[i].fadeToBlackBy(32); // fade by 25% aka 64/256ths
 		}
 		if (index < LENGTH_LEDS[ledChase]){
 			leds[index].setRGB(255, 0, 150);
@@ -89,7 +99,7 @@ void CLeds::animMultiplier(uint8_t device, uint8_t multiplier){
 	bool multiplierOn = false;
 	while (index < (section * multiplier) + DIM_OFFSET){
 		for (uint8_t i = 0; i < (section * multiplier); i++){
-				leds[i].fadeToBlackBy(64); // fade by 25% aka 64/256ths
+				leds[i].fadeToBlackBy(32); // fade by 25% aka 64/256ths
 		}
 		if (index < (section * multiplier) + LIGHT_OFFSET){
 			leds[index].setRGB(150, 255, 0);
@@ -153,21 +163,21 @@ void CLeds::animOuter(uint8_t device, uint8_t multiplier){
 
 void CLeds::animChase(uint8_t device){
 	uint8_t index = 0;
+	device += 2;
+	Serial.print("Device :: ");
 	Serial.println(device);
-	if (device != 0 && device != 1){
-		while (index < LENGTH_LEDS[2]){
+		while (index < LENGTH_LEDS[device]){
 			for (uint8_t i = 0; i < LENGTH_LEDS[device]; i++){
-					leds[i].fadeToBlackBy(64); // fade by 25% aka 64/256ths
+					leds[i].fadeToBlackBy(32); // fade by 25% aka 64/256ths
 			}
 			if (index < LENGTH_LEDS[device]){
 					leds[index].setRGB(255, 0, 150);
 			}
-			FastLED[2].showLeds();
+			FastLED[device].showLeds();
 			delay(delay_Time);
 			index++;
 		}
 	}
-}
 
 void CLeds::quietOff(){
 	for (int i = 0; i < NUM_LEDS; i++){

@@ -91,7 +91,7 @@ void Master::losePower(Cycle& bike){
 void Master::adjustPower(){
 	for (uint8_t i = 0; i < 3; i++){
 			uint32_t currAcc = digitalRead(Cycles[i].encoder);
-			int8_t difference = abs(currAcc - Cycles[i].prevAcc);
+			int8_t difference = currAcc - Cycles[i].prevAcc;
 			Cycles[i].acc += abs(difference);
 			Cycles[i].prevAcc = currAcc;
 			gainPower(Cycles[i]); // if the bike is being pedaled;
@@ -138,8 +138,8 @@ void Master::transmit(uint8_t address, int8_t package){
 //TODO might need some padding
 void Master::initRoundStart(){
 		for (uint8_t i = 0; i < NUM_BIKES; i++){
-				//if (!roundStarted && Cycles[i].energyMeter){
-				if (!roundStarted && Cycles[i].encoder){
+				if (!roundStarted && Cycles[i].energyMeter){
+				//if (!roundStarted && Cycles[i].encoder){
 					roundStarted = true; 
 					roundTimer = millis();
 					Serial.println("roundInit");
@@ -174,6 +174,7 @@ bool Master::timeOut(){
 }
 
 void Master::reset(){
+		delay(2000);
 		roundTimer = 0;
 		roundStarted = false;
 		for (uint8_t i = 0; i < NUM_BIKES; i++){
@@ -187,7 +188,6 @@ void Master::reset(){
 void Master::update(uint8_t action){
 	//transmit(relay, packRelay(HIGH, audioOne));
 	delay(200);
-	Serial.print("WTF IS THE CURRENT DEVICE!! :: ");
 	Serial.println(currDevice);
 	transmit(relay, packRelay(HIGH, currDevice));
 }

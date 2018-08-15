@@ -85,9 +85,10 @@ void DigitGroup::update(){
 		mySerial.write(curr->address);
 		mySerial.write(0x43); 
 		mySerial.write(curr->number + 0x80);
-		uint8_t checksum = ((curr->address + 0x43 + curr->number + 0x80) % 64) + 0xC0;
+		uint8_t checksum = ((curr->address + command + curr->number + 0x80) % mod) + eof;
 		mySerial.write(checksum);
 		curr = curr->next;
+		delay(1);
 	}
 
 	/*
@@ -142,10 +143,16 @@ void DigitGroup::setDigit(uint8_t segment, uint8_t num, boolean state = false){
 
 void DigitGroup::changeAddress(uint8_t addy){
 	Segment* curr = head;
+	uint8_t temp = addy;
+	//Serial.print("addy :: ");
+	//Serial.println(addy);
 	while (curr != NULL){
-		curr->address = addy;
-		addy++;
+		curr->address = temp;
+		//Serial.print("current head address :: ");
+		//Serial.println(curr->address);
+		temp++;
 		curr = curr->next;
+		delay(1000);
 	}
 }
 
@@ -379,7 +386,7 @@ void Digits::sendByte(uint8_t data){
 DigitGroup* Digits::addGroup(uint8_t address, uint8_t groupSize){
 	uint8_t static group = 0;
 	Segment* groupPointer = NULL;
-	static Segment* prevNode = NULL;
+	Segment* prevNode = NULL;
 	if (groupSize != 0){
 		for (uint8_t i = 0; i < groupSize; i++){
 			if (i == 0){
