@@ -30,11 +30,12 @@ Master::Master(){
 				//add to array
 				Cycles[i] = cycle;
 		}
+		device = -1;
 }
 
 //Selection Function
 void Master::randomDevice(){
-		device = uint8_t(random(MAX_DEVICES));
+		device = (device + 1) % 5;
 		uint8_t optoCopter = 5;
 		if (device == optoCopter){
 				if (optoTimer != 0){
@@ -46,6 +47,8 @@ void Master::randomDevice(){
 		else{
 				optoCopter = 0;
 		}
+
+
 }
 
 //==========================================================
@@ -75,11 +78,13 @@ void Master::gainPower(Cycle& bike){
  *
  */
 void Master::losePower(Cycle& bike){
+	/*
 		uint32_t currentTime = millis() - bike.energyTimer;
 		if (currentTime > losePowerTHRESH && bike.energyMeter > 0){
 				bike.energyTimer = millis();
 				bike.energyMeter--;
 		}
+		*/
 }
 
 /*
@@ -164,6 +169,7 @@ void Master::winState(){
 		}
 		currDevice = device;
 		modeClk.setAlarm(timeMultipliers[totalEnergy/2] * totalEnergy / deviceInput[device]);
+		delay(4000);
 		reset();
 }
 

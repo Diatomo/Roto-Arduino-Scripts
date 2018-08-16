@@ -152,7 +152,7 @@ void DigitGroup::changeAddress(uint8_t addy){
 		//Serial.println(curr->address);
 		temp++;
 		curr = curr->next;
-		delay(1000);
+		//delay(1000);
 	}
 }
 

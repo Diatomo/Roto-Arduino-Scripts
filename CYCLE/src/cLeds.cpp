@@ -21,14 +21,15 @@ CLeds::CLeds(){
 	 */
 	//constructors
 	FastLED.addLeds<NEOPIXEL,4>(leds, LENGTH_LEDS[0]); 
-	FastLED.addLeds<NEOPIXEL,5>(leds, LENGTH_LEDS[1]); 
-	FastLED.addLeds<NEOPIXEL,6>(leds, LENGTH_LEDS[2]);//monkeys 
-	FastLED.addLeds<NEOPIXEL,7>(leds, LENGTH_LEDS[3]);//optocopter 
-	FastLED.addLeds<NEOPIXEL,8>(leds, LENGTH_LEDS[4]);//blender 
-	FastLED.addLeds<NEOPIXEL,9>(leds, LENGTH_LEDS[5]);
-	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[6]);//chainsaw
-	FastLED.addLeds<NEOPIXEL,11>(leds, LENGTH_LEDS[7]);
-	
+	FastLED.addLeds<NEOPIXEL,5>(leds, LENGTH_LEDS[1]);
+	FastLED.addLeds<NEOPIXEL,6>(leds, LENGTH_LEDS[2]);//optocopter 
+	FastLED.addLeds<NEOPIXEL,7>(leds, LENGTH_LEDS[3]);//monkeys
+	FastLED.addLeds<NEOPIXEL,11>(leds, LENGTH_LEDS[4]);//chainsaw
+	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[5]);//blender
+	FastLED.addLeds<NEOPIXEL,9>(leds, LENGTH_LEDS[6]);//coplights
+	FastLED.addLeds<NEOPIXEL,8>(leds, LENGTH_LEDS[7]);
+
+	/*
 	//constructors
 	FastLED.addLeds<NEOPIXEL,4>(leds, LENGTH_LEDS[0]); 
 	FastLED.addLeds<NEOPIXEL,5>(leds, LENGTH_LEDS[1]); 
@@ -38,6 +39,7 @@ CLeds::CLeds(){
 	FastLED.addLeds<NEOPIXEL,9>(leds, LENGTH_LEDS[5]);
 	FastLED.addLeds<NEOPIXEL,10>(leds, LENGTH_LEDS[6]);//chainsaw
 	FastLED.addLeds<NEOPIXEL,11>(leds, LENGTH_LEDS[7]);
+	*/
 	
 	//pin declarations && constants;
 	outer = 0;
@@ -73,6 +75,7 @@ void CLeds::update(uint8_t action){
 
 void CLeds::animTest(uint8_t device, uint8_t ledChase){
 	uint8_t index = 0;
+	Serial.println(ledChase);
 	while (index < LENGTH_LEDS[ledChase] + DIM_OFFSET){
 		for (uint8_t i = 0; i < LENGTH_LEDS[ledChase]; i++){
 			leds[i].fadeToBlackBy(32); // fade by 25% aka 64/256ths
@@ -163,9 +166,9 @@ void CLeds::animOuter(uint8_t device, uint8_t multiplier){
 
 void CLeds::animChase(uint8_t device){
 	uint8_t index = 0;
-	device += 2;
 	Serial.print("Device :: ");
 	Serial.println(device);
+	device += 2;
 		while (index < LENGTH_LEDS[device]){
 			for (uint8_t i = 0; i < LENGTH_LEDS[device]; i++){
 					leds[i].fadeToBlackBy(32); // fade by 25% aka 64/256ths

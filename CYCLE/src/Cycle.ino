@@ -14,19 +14,35 @@
 
 #include <newDigits.h>
 #include "master.h"
-//#include "cRelay.h"
-//#include "cLeds.h"
+#include "cRelay.h"
+#include "cLeds.h"
 #include <Wire.h>
 #include <alarmClock.h>
 
 Master overmind = Master();
-//CRelay relay = CRelay();
-//CLeds leds = CLeds();
+CRelay relay = CRelay();
+CLeds leds = CLeds();
 
 Digits digA = Digits(8);
-DigitGroup* groupBike = digA.addGroup(31,2);
-DigitGroup* groupDevice = digA.addGroup(1, 3);
-DigitGroup* centralClock = digA.addGroup(21,3);
+DigitGroup* groupBike;
+DigitGroup* groupDevice;
+DigitGroup* centralClock;
+
+bool started = false;
+int8_t currDevice = -1;
+
+uint8_t deviceAddy[5] = {17,13,5,9,1};
+//0  == correct trace and segment;;
+//4 == correct trace and segment
+//2 = correct trace and segment
+
+//3 = INCORRECT;;
+
+//device 2 = coplights;
+//
+
+
+uint8_t clockAddress = 20;
 
 //switches
 bool leds_upload;
@@ -35,31 +51,29 @@ bool relay_upload;
 bool eventHappened = false;
 uint8_t action = 0;
 
-//void updateBikes();
-//void updateDevice();
+void updateBikes();
+void updateDevice();
 
-/*
 alarmClock update = alarmClock(updateBikes);
 uint32_t const TIMR = 1000;
 uint8_t const Counter = 30;
 int8_t counter = 30;
 
 alarmClock deviceClk = alarmClock(updateDevice);
-uint32_t const deviceTIMR = 100;
+uint32_t const deviceTIMR = 50;
 
 boolean relayON = false;
 int32_t total = 0;
-*/
+
 
 //SETUP
 //================================================================
-/*
 void setup_leds_comm(){
 		//begin i2c connection (reader :: slave)
 		uint8_t address = 10;
 		Wire.begin(address);
 		Wire.onReceive(event);
-		//leds.testLeds();
+		leds.testLeds();
 }
 
 void setup_relay_comm(){
@@ -86,7 +100,6 @@ void setupPinsOutput(int start, int end){
 		pinMode(i, OUTPUT);
 	}
 }
-*/
 
 void setup(){
 
@@ -105,14 +118,16 @@ void setup(){
 	Serial.print("RELAY :: ");
 	Serial.println(relay_upload);
 
-	Serial.print("clock objecti :: ");
-	Serial.println(centralClock->head->address);
-	groupDevice->segDisp(0,false);
-	delay(50);
-	groupDevice->changeAddress(1);
-	Serial.print("clock objecti :: ");
-	Serial.println(centralClock->head->address);
 /*
+	bikes[0] = dig.addGroup(1,2);
+	bikes[1] = dig.addGroup(4,2);
+	bikes[2] = dig.addGroup(6,2);
+*/
+	groupBike = digA.addGroup(31,2);
+	groupDevice = digA.addGroup(0x3F,3);
+	groupDevice->segDisp(0,false);
+	centralClock = digA.addGroup(21,3);
+
 	if (!leds_upload && !relay_upload){
 		setupPinsInput(4,6);// start pin, end pin
 		pinMode(8, OUTPUT);
@@ -125,24 +140,11 @@ void setup(){
 	//depends on circuit board upload	
 	if (leds_upload) { setup_leds_comm(); }
 	else if (relay_upload) { setup_relay_comm(); }
-	else{ setup_master_comm(); }*/
+	else{ setup_master_comm(); }
 }
 
 //==================================================================
 
-
-
-void addressChange(){
-	Serial.print("clock objecti :: ");
-	Serial.println(centralClock->head->address);
-	groupDevice->segDisp(0,false);
-	delay(50);
-	groupDevice->changeAddress(1);
-	Serial.print("clock objecti :: ");
-	Serial.println(centralClock->head->address);
-}
-
-/*
 
 //event for wire
 void event(int howmany){
@@ -163,40 +165,39 @@ void transmit(){
 
 
 void updateBikes(){
-	groupBike->segDisp(counter, false);
+	if (counter != 0){
+		groupBike->segDisp(counter, false);
+	}
 	uint32_t sum = 0;
 	for (uint8_t i = 0; i < 3; i++){
 		sum += overmind.Cycles[i].energyMeter;
 	}
-	Serial.print("Sum :: ");
-	Serial.println(sum);
 	centralClock->segDisp(sum, false);
 	counter--;
 	if (counter == 0 || overmind.roundStarted == false){
-		if (counter == 0 ) { total = sum; }
+		if (counter == 0) { total = sum;}
 		counter = 30;
 	}
 }
 
 void updateDevice(){
-	uint8_t deviceAddy[5] = {1,5,9,13,17};
-	groupDevice->changeAddress(deviceAddy[overmind.currDevice]);
-	delay(5);
+	if (!started){
+		groupDevice->changeAddress(deviceAddy[overmind.currDevice]);
+		started = true;
+	}
 	groupDevice->segDisp(total, false);
-	
-	Serial.print("Total :: ");
-	Serial.println(total);
+	Serial.print("device :: ");
+	Serial.println(overmind.device);
 	total = total - 1;
-	if (total < 0){
+	if (total <= 0){
 		relayON = false;
+		groupDevice->segDisp(0, false);
+		started = false;
 	}
 }
-*/
-void loop(){
-	addressChange();
-	//if led and relay read low then activate overmind (master)
 
-	/*
+void loop(){
+	//if led and relay read low then activate overmind (master)
 	if (!leds_upload && !relay_upload) { 
 		overmind.loop(); 
 		if (!update.isSet()){
@@ -208,20 +209,19 @@ void loop(){
 	}
 		
 	if (!deviceClk.isSet() && relayON){
-			deviceClk.setAlarm(deviceTIMR);
+			deviceClk.setAlarm(50);
 		}
 		else{
 			deviceClk.poll();
 		}	
-	*/
+	
 	//Communication Loop
-	//if (eventHappened){
-	//	if (leds_upload) { /*leds.update(action);*/ Serial.println("leds"); }
-	//	else if (relay_upload) { /*relay.update(action);*/ Serial.println("relay"); }
-	/*	else {overmind.update(action); relayON = true; Serial.println("overmind event");}
+	if (eventHappened){
+		if (leds_upload) { leds.update(action); Serial.println("leds"); }
+		else if (relay_upload) { relay.update(action); Serial.println("relay"); }
+		else {overmind.update(action); relayON = true; Serial.println("overmind event");}
 		eventHappened = false;
 		action = 0;
-	}	*/
-	//if (relay_upload) {/*relay.loop(); updateDevice();*/}
-	
+	}	
+	if (relay_upload) {relay.loop(); updateDevice();}
 }

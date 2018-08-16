@@ -26,12 +26,17 @@ void CRelay::update(uint8_t action){
 		Serial.println("relay ACTION!!");
 		uint8_t command = (action & 0x10) >> 4; //either a 0 or a 1;
 		uint8_t button = action & 0x0F; //represents an output pin
+		uint8_t deviceMap[5] = {1,0,3,2,4};
+		button = deviceMap[button];
 		test(command, button);
 		if (button != optoCopter || button != audio){
 			currDevice = button;
 		}
 		resetTimer = millis();
 		oe->extendedWrite(button, command);
+		oe->extendedWrite(audio, HIGH);
+		delay(50);
+		oe->extendedWrite(audio,LOW);
 }
 
 void CRelay::loop(){
