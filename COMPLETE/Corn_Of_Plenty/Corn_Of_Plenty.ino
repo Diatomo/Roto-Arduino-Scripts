@@ -172,6 +172,9 @@ char multiplex(){
 						if (keyPressed){
 								resetClk.setAlarm(resetTimer);//resets alarm
 								input =  keypad[i][j];
+								Serial.print("What key was pressed? ");
+								Serial.println(input);
+								while (ie.extendedRead(COLUMNS[j]));
 						}
 				}
 				oe.extendedWrite(ROWS[i], LOW);

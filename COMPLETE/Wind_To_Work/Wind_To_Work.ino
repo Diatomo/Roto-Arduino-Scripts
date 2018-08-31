@@ -20,6 +20,7 @@ Notes::
 
 #include <alarmClock.h>
 #include <digits.h>
+//#include <newDigits.h>
 
 #define versionString "Roto - [Discovery World Energy] [Putting Wind To Work]"
 
@@ -82,9 +83,30 @@ alarmClock clocks[NUM_CLOCKS] = {activeClk, attractClk, resetClk};
 //=================================
 
 //instantiate objects
+
+
 digits dig = digits(segData, segClock, segLatch, NUM_DIGITS);
 digitGroup segsBot = digitGroup(&dig, offsetA, lengthA); 
 digitGroup segsTop = digitGroup(&dig, offsetB, lengthB); 
+
+/*
+An example of the new Library
+
+Digits digA = Digits(8); //where 8 is the serial pin
+DigitGroup* segsBot = digA.addGroup(address, length_Of_Digit_Group); 
+DigitGroup* segsTop = digA.addGroup(address, length_of_digit_group);
+
+to use I really only have two functions.
+
+segmentDisplay->changeAddress(address); //changes address;
+segmentDisplay->segDisp(numberToDisplay, false); //the false was an attempt to implement default parameters which I never had time to go over and fix. I'd just make sure it's in there for now.  
+
+
+**IMPORTANT**
+
+	Make sure you include the new digits library. It might be easiest to just place it in the same directory and use quotes instead of <>. 
+
+*/
 
 
 /*=========================================================*/
@@ -267,7 +289,7 @@ void alarmClockRoutine(){
 *  	Attraction Function :: <3
 */
 void sexify(){
-    segsBot.chaseAnimation8();
+    //segsBot.chaseAnimation8();
 	segsTop.segDisp(highScore);
 }
 
